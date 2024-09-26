@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using iFence;
+
 namespace IcoBox;
 public class MainApp : Form
 {
@@ -17,6 +19,8 @@ public class MainApp : Form
     [STAThread]
     public static void Main()
     {
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
         Application.Run(new MainApp());
     }
 
@@ -24,13 +28,14 @@ public class MainApp : Form
     {
         // Create a simple tray menu with a few items
         trayMenu = new ContextMenuStrip();
-        trayMenu.Items.Add("New Icon Group", null, CreateIconGrpup!);
+        trayMenu.Items.Add("About", null, AboutIcoBox!);
+        trayMenu.Items.Add("New Icon Box", null, CreateIconGrpup!);
         trayMenu.Items.Add("-");
         trayMenu.Items.Add("Exit", null, OnExit!);
 
         // Create a tray icon
         trayIcon = new NotifyIcon();
-        trayIcon.Text = "Icon Group";
+        trayIcon.Text = "Icon Box";
         trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
 
         // Add menu to tray icon
@@ -42,7 +47,12 @@ public class MainApp : Form
 
     private void CreateIconGrpup(object sender, EventArgs e)
     {
-        MessageBox.Show("Option 1 clicked!");
+        new IconBox().Show();
+    }
+
+    private void AboutIcoBox(object sender, EventArgs e)
+    {
+        MessageBox.Show("Show About Box");
     }
 
     // Exit action
@@ -62,9 +72,7 @@ public class MainApp : Form
     {
         // Clean up tray icon
         if (disposing && trayIcon != null)
-        {
             trayIcon.Dispose();
-        }
 
         base.Dispose(disposing);
     }
