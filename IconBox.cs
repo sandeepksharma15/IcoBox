@@ -20,8 +20,10 @@ public class IconBox : Form
     private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
     private bool isDragging = false;
-    private string title = "Icon Box";
+    private string title = "Icon Box Demo";
     private Point dragStartPoint;
+    private Label titleLabel;
+    private Panel headerPanel;
 
     public IconBox()
     {
@@ -33,33 +35,34 @@ public class IconBox : Form
         this.StartPosition = FormStartPosition.Manual;
         this.Bounds = bounds;
         this.ShowInTaskbar = false; // Don't show in taskbar
-
-        //this.BackColor = Color.DarkBlue;
-        //this.TransparencyKey = Color.Lime;
         this.Opacity = 0.5;
 
-        // Create title label
-        var headerPanel = new Panel
+        // Create The Title Label
+        titleLabel = new Label
+        {
+            Text = title,
+            AutoSize = true,
+            Height = 30,
+            ForeColor = Color.Black,
+            Cursor = Cursors.Default,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Font = new Font("Tahoma", 16)
+        };
+
+        // Create Title Bar
+        headerPanel = new Panel
         {
             Text = title,
             AutoSize = false,
             Dock = DockStyle.Top,
             Height = 30,
-            Cursor = Cursors.Hand // Change cursor to hand over title bar
+            Cursor = Cursors.SizeAll // Change cursor to hand over title bar
         };
 
-        //headerPanel = new Label
-        //{
-        //    Text = title,
-        //    AutoSize = false,
-        //    Dock = DockStyle.Top,
-        //    Height = 30,
-        //    TextAlign = ContentAlignment.MiddleCenter,
-        //    BackColor = Color.Transparent,
-        //    Cursor = Cursors.Hand // Change cursor to hand over title bar
-        //};
+        titleLabel.DoubleClick += TitleLabel_DoubleClick!; // Double click to edit title
 
-        //headerPanel.DoubleClick += TitleLabel_DoubleClick!; // Double click to edit title
+        headerPanel.Controls.Add(titleLabel);
+
         headerPanel.MouseMove += HeadePanel_MouseMove!; // Mouse move to enable dragging
         headerPanel.MouseDown += HeadePanel_MouseDown!; // Mouse down to start dragging
         headerPanel.MouseUp += HeadePanel_MouseUp!; // Mouse up to stop dragging
@@ -84,23 +87,46 @@ public class IconBox : Form
         }
     }
 
-    //private void TitleLabel_DoubleClick(object sender, EventArgs e)
-    //{
-    //    // Allow editing of the title label on double click
-    //    using (TextBox textBox = new TextBox())
-    //    {
-    //        textBox.Text = title;
-    //        textBox.Bounds = headerPanel.Bounds; // Position the textbox
-    //        textBox.TextChanged += (s, args) => title = textBox.Text; // Update title
-    //        textBox.Leave += (s, args) => {
-    //            headerPanel.Text = title;
-    //            Controls.Remove(textBox); // Remove textbox when done
-    //        };
-    //        Controls.Add(textBox);
-    //        textBox.Focus(); // Focus on the textbox for immediate editing
-    //        textBox.SelectAll(); // Select all text
-    //    }
-    //}
+    private void TitleLabel_DoubleClick(object sender, EventArgs e)
+    {
+        // Allow editing of the title label on double click
+        TextBox textBox = new TextBox
+        {
+            Text = titleLabel.Text,
+            Bounds = titleLabel.Bounds, // Position the textbox
+            BackColor = SystemColors.Window, // Match the system background color
+            BorderStyle = BorderStyle.FixedSingle, // No border
+            Font = titleLabel.Font, // Match the font
+        };
+
+        Controls.Add(textBox);
+        textBox.BringToFront(); // Ensure textbox is drawn in front of the title label
+        textBox.Focus(); // Focus on the textbox for immediate editing
+        textBox.SelectAll(); // Select all text
+
+        // Update title when text changes
+        textBox.Leave += (s, args) =>
+        {
+            ConfirmTitleChange(textBox);
+        };
+
+        // Handle pressing Enter or Tab
+        textBox.KeyDown += (s, keyArgs) =>
+        {
+            if (keyArgs.KeyCode == Keys.Enter || keyArgs.KeyCode == Keys.Tab)
+            {
+                // Simulate leaving the TextBox when Enter or Tab is pressed
+                ConfirmTitleChange(textBox);
+                keyArgs.Handled = true;
+            }
+        };
+    }
+
+    private void ConfirmTitleChange(TextBox textBox)
+    {
+        titleLabel.Text = textBox.Text;
+        Controls.Remove(textBox); // Remove the textbox after editing is complete
+    }
 
     private void HeadePanel_MouseMove(object sender, MouseEventArgs e)
     {
