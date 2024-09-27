@@ -14,4 +14,5 @@ public static class AppInfo
     public static string AppIcon { get; set; } = "";
 
     public static string NewBoxTitle { get; set; } = "New Icon Box";
+    public static string SaveFileName { get; set; } = "IcoBoxData.json";
 }

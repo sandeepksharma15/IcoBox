@@ -2,7 +2,9 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-using IWshRuntimeLibrary; // Add this for handling .lnk files (COM interop)
+using IWshRuntimeLibrary;
+
+using static IcoBox.MainApp; // Add this for handling .lnk files (COM interop)
 
 namespace IcoBox;
 
@@ -39,7 +41,7 @@ public class IconBox : Form
     private static int IconSpacingH;
     private static int IconSpacingV;
 
-    private static string? AppFolder
+    public static string? AppFolder
     {
         get
         {
@@ -53,25 +55,31 @@ public class IconBox : Form
         }
     }
 
-    public IconBox()
+    public IconBox(WindowData window) :
+        this(new Rectangle(window.X, window.Y, window.Width, window.Height), window.Title, window.IconPaths)
     {
-        SetWindowAppearance();
+    }
+
+    public IconBox(Rectangle? bounds = null, string? title = null, List<string>? iconPaths = null)
+    {
+        SetWindowAppearance(bounds);
 
         // Allow Drag And Drop
         AllowDrop = true;
 
         // Create The Title Label
-        titleLabel = CreateTitleLabel(AppInfo.NewBoxTitle);
+        titleLabel = CreateTitleLabel(title);
 
         // Create Title Bar
         headerPanel = CreateHeaderPanel();
 
         // Create The Icon List View
-        iconListView = CreateIconListView(Height, Width);
+        iconListView = CreateIconListView(Height, Width, iconPaths);
 
         // Subscribe To Drag Events
         iconListView.DragEnter += new DragEventHandler(OnDragEnter);
         iconListView.DragDrop += new DragEventHandler(OnDragDrop);
+        iconListView.ItemDrag += IconListView_ItemDrag;
 
         // Subscribe to the Click event to handle icon clicks
         iconListView.ItemActivate += new EventHandler(OnItemActivate);
@@ -86,6 +94,31 @@ public class IconBox : Form
 
         Controls.Add(headerPanel);
         Controls.Add(iconListView);
+    }
+
+    // Item drag event handler
+    private void IconListView_ItemDrag(object? sender, ItemDragEventArgs e)
+    {
+        List<string> filePaths = [];
+        List<ListViewItem> itemsToRemove = [];
+
+        foreach (ListViewItem selectedItem in iconListView.SelectedItems)
+        {
+            string filePath = selectedItem.Tag!.ToString()!;
+            filePaths.Add(filePath);
+            itemsToRemove.Add(selectedItem); // Collect items to remove after drag
+        }
+
+        if (filePaths.Count > 0)
+        {
+            DataObject data = new(DataFormats.FileDrop, filePaths.ToArray());
+            DragDropEffects result = iconListView.DoDragDrop(data, DragDropEffects.Move);
+
+            // If the operation was successful, remove the dragged items from the ListView
+            if (result == DragDropEffects.Move)
+                foreach (ListViewItem item in itemsToRemove)
+                    iconListView.Items.Remove(item); // Remove from ListView
+        }
     }
 
     // Handle the DragEnter event
@@ -340,8 +373,10 @@ public class IconBox : Form
         };
     }
 
-    private static Label CreateTitleLabel(string title)
+    private static Label CreateTitleLabel(string? title)
     {
+        title ??= AppInfo.NewBoxTitle;
+
         return new Label
         {
             Text = title,
@@ -354,15 +389,14 @@ public class IconBox : Form
         };
     }
 
-    private static ListView CreateIconListView(int height, int width)
+    private static ListView CreateIconListView(int height, int width, List<string>? iconPaths)
     {
         ImageList imageList = new();
         imageList.ImageSize = new Size(40, 40); // Size of icons
 
-        return new ListView
+        var iconListView = new ListView
         {
             View = View.LargeIcon,
-            //Dock = DockStyle.Fill,
             LargeImageList = imageList,
             AllowDrop = true,
             Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right,
@@ -371,17 +405,39 @@ public class IconBox : Form
             Height = height - HEADER_HEIGHT,
             Left = 0
         };
+
+        foreach (string filePath in iconPaths ?? [])
+        {
+            string fileName = Path.GetFileName(filePath);
+            string destinationPath = Path.Combine(AppFolder!, fileName);
+
+            // Create a ListViewItem for the moved file and store the file path in the Tag
+            ListViewItem item = new(fileName)
+            {
+                ImageKey = fileName, // Use the filename as the key
+                Tag = destinationPath // Store the file path in the Tag property
+            };
+
+            // Extract and set the icon for the item
+            Icon fileIcon = Icon.ExtractAssociatedIcon(destinationPath)
+                ?? new Icon(SystemIcons.Application, 48, 48);
+
+            iconListView.LargeImageList!.Images.Add(fileName, fileIcon);
+            iconListView.Items.Add(item);
+        }
+
+        return iconListView;
     }
 
-    private void SetWindowAppearance()
+    private void SetWindowAppearance(Rectangle? bounds = null)
     {
-        var bounds = GetWindowBounds(); // Get bounds for the window
+        bounds ??= GetWindowBounds(); // Get bounds for the window
 
         // Set window properties
         FormBorderStyle = FormBorderStyle.Sizable;
         ControlBox = false; // No control box
         StartPosition = FormStartPosition.Manual;
-        Bounds = bounds;
+        Bounds = bounds.Value;
         ShowInTaskbar = false; // Don't show in taskbar
         Opacity = 1.0;
     }
