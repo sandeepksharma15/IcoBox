@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -35,6 +36,7 @@ public class IconBox : Form
     private readonly Panel headerPanel;
     private readonly ListView iconListView;
     private ContextMenuStrip contextMenuStrip;
+    private readonly PictureBox iconPictureBox;
 
     private readonly List<(string FilePath, string FileName)> movedFiles = []; // To store the file paths and names of moved files
 
@@ -69,6 +71,9 @@ public class IconBox : Form
         // Allow Drag And Drop
         AllowDrop = true;
 
+        // Create The Icon PictureBox
+        iconPictureBox = GetIconPictureBox();
+
         // Create The Title Label
         titleLabel = CreateTitleLabel(title);
 
@@ -88,6 +93,7 @@ public class IconBox : Form
 
         titleLabel.DoubleClick += TitleLabel_DoubleClick; // Double click to edit title
 
+        headerPanel.Controls.Add(iconPictureBox);
         headerPanel.Controls.Add(titleLabel);
 
         headerPanel.MouseMove += HeaderPanel_MouseMove; // Mouse move to enable dragging
@@ -482,9 +488,25 @@ public class IconBox : Form
             ForeColor = Color.Black,
             Cursor = Cursors.Default,
             TextAlign = ContentAlignment.MiddleLeft,
-            Font = new Font("Tahoma", 16)
+            Font = new Font("Tahoma", 16),
+            Left = 25,
         };
     }
+
+    private static PictureBox GetIconPictureBox()
+    {
+        var iconPictureBox = new PictureBox
+        {
+            Size = new Size(16, 16),
+            Location = new Point(7, 5),
+            SizeMode = PictureBoxSizeMode.StretchImage
+        };
+
+        iconPictureBox.Image = new Icon(Path.Combine(IconsFolder!, "IcoBox III (16x16).ico"), 16, 16).ToBitmap();
+
+        return iconPictureBox;
+    }
+
 
     private static ListView CreateIconListView(int height, int width, List<string>? iconPaths)
     {

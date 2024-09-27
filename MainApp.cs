@@ -9,9 +9,8 @@ public class MainApp : Form
 {
     private NotifyIcon? trayIcon;
     private ContextMenuStrip? trayMenu;
-    private readonly string? iconsFolder;
 
-    public string? IconsFolder => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
+    public static string? IconsFolder => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
 
     [STAThread]
     public static void Main()
