@@ -12,4 +12,6 @@ public static class AppInfo
     public static string AppLicenseUrl { get; set; } = "https://opensource.org/licenses/MIT";
     public static string AppUrl { get; set; } = "";
     public static string AppIcon { get; set; } = "";
+
+    public static string NewBoxTitle { get; set; } = "New Icon Box";
 }

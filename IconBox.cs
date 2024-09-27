@@ -23,7 +23,6 @@ public class IconBox : Form
     private const int HEADER_HEIGHT = 30;
 
     private bool isDragging;
-    private readonly string title = "Icon Box";
     private Point dragStartPoint;
 
     private readonly Label titleLabel;
@@ -59,7 +58,7 @@ public class IconBox : Form
         AllowDrop = true;
 
         // Create The Title Label
-        titleLabel = CreateTitleLabel();
+        titleLabel = CreateTitleLabel(AppInfo.NewBoxTitle);
 
         // Create Title Bar
         headerPanel = CreateHeaderPanel();
@@ -266,7 +265,7 @@ public class IconBox : Form
         isDragging = false;
     }
 
-    private Rectangle GetWindowBounds()
+    private static Rectangle GetWindowBounds()
     {
         // Calculate and set window size based on icon size and spacing
         GetDesktopIconMetrics(out IconWidth, out IconHeight, out IconSpacingH,
@@ -277,18 +276,18 @@ public class IconBox : Form
         int windowHeight = 3 * IconSpacingV + HEADER_HEIGHT; // Add height for title bar
 
         // Set the initial size and position of the window
-        Width = windowWidth;
-        Height = windowHeight;
+        //Width = windowWidth;
+        //Height = windowHeight;
 
         // Get screen dimensions
         var screenWidth = Screen.PrimaryScreen!.Bounds.Width;
         var screenHeight = Screen.PrimaryScreen!.Bounds.Height;
 
         // Calculate position (right side aligned, bottom 100px above the screen)
-        int x = screenWidth - Width - 10;  // Position x such that right side touches viewport (with 10px padding)
-        int y = screenHeight - Height - 100;  // Position y 100px above bottom of screen
+        int x = screenWidth - windowWidth - 10;  // Position x such that right side touches viewport (with 10px padding)
+        int y = screenHeight - windowHeight - 100;  // Position y 100px above bottom of screen
 
-        return new Rectangle(x, y, Width, Height);
+        return new Rectangle(x, y, windowWidth, windowHeight);
     }
 
     // Method to get desktop icon metrics (size and spacing)
@@ -312,11 +311,10 @@ public class IconBox : Form
         spacingVertical = iconSpacingV;     // Size Of The Grid Holding Icon
     }
 
-    private Panel CreateHeaderPanel()
+    private static Panel CreateHeaderPanel()
     {
         return new Panel
         {
-            Text = title,
             AutoSize = false,
             Dock = DockStyle.Top,
             Height = HEADER_HEIGHT,
@@ -324,7 +322,7 @@ public class IconBox : Form
         };
     }
 
-    private Label CreateTitleLabel()
+    private static Label CreateTitleLabel(string title)
     {
         return new Label
         {
@@ -338,7 +336,7 @@ public class IconBox : Form
         };
     }
 
-    private ListView CreateIconListView(int height, int width)
+    private static ListView CreateIconListView(int height, int width)
     {
         ImageList imageList = new();
         imageList.ImageSize = new Size(64, 64); // Size of icons
