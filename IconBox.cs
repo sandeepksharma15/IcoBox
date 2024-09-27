@@ -1,5 +1,8 @@
-﻿using System.Reflection;
+﻿using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
+
+using IWshRuntimeLibrary; // Add this for handling .lnk files (COM interop)
 
 namespace IcoBox;
 
@@ -70,6 +73,9 @@ public class IconBox : Form
         iconListView.DragEnter += new DragEventHandler(OnDragEnter);
         iconListView.DragDrop += new DragEventHandler(OnDragDrop);
 
+        // Subscribe to the Click event to handle icon clicks
+        iconListView.ItemActivate += new EventHandler(OnItemActivate);
+
         titleLabel.DoubleClick += TitleLabel_DoubleClick; // Double click to edit title
 
         headerPanel.Controls.Add(titleLabel);
@@ -111,11 +117,14 @@ public class IconBox : Form
                     string destinationPath = Path.Combine(AppFolder!, fileName);
 
                     // Move the file to the destination folder
-                    File.Move(filePath, destinationPath);
+                    System.IO.File.Move(filePath, destinationPath);
 
-                    // Create a ListViewItem for the moved file
-                    ListViewItem item = new(fileName);
-                    item.ImageKey = fileName; // Use the filename as the key
+                    // Create a ListViewItem for the moved file and store the file path in the Tag
+                    ListViewItem item = new(fileName)
+                    {
+                        ImageKey = fileName, // Use the filename as the key
+                        Tag = destinationPath // Store the file path in the Tag property
+                    };
 
                     // Extract and set the icon for the item
                     Icon fileIcon = Icon.ExtractAssociatedIcon(destinationPath)
@@ -129,6 +138,59 @@ public class IconBox : Form
                     MessageBox.Show($"Error moving file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
         }
+    }
+
+    // Handle the click event to open the file
+    private void OnItemActivate(object? sender, EventArgs e)
+    {
+        if (iconListView.SelectedItems.Count > 0)
+        {
+            ListViewItem selectedItem = iconListView.SelectedItems[0];
+            string? filePath = selectedItem.Tag!.ToString(); // Retrieve the file path from the Tag
+
+            try
+            {
+                // If the file is a .lnk shortcut, resolve its target
+                if (Path.GetExtension(filePath!).Equals(".lnk", StringComparison.CurrentCultureIgnoreCase))
+                    filePath = ResolveShortcut(filePath!);
+
+                // Create a process to open the file, requesting elevation if necessary
+                ProcessStartInfo psi = new(filePath!)
+                {
+                    UseShellExecute = true,
+                    Verb = "runas" // This requests elevation
+                };
+
+                // Open the file, folder, or application
+                Process.Start(psi);
+            }
+            catch (System.ComponentModel.Win32Exception ex)
+            {
+                if (ex.NativeErrorCode == 1223) // The operation was canceled by the user (User declined the UAC prompt)
+                {
+                    MessageBox.Show("You declined the elevation request.", "Operation Canceled", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show($"Unable to open file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Unable to open file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+    }
+
+    // Method to resolve the target of a .lnk shortcut
+    private string ResolveShortcut(string shortcutPath)
+    {
+        // Create a new WshShell object to work with the shortcut
+        WshShell shell = new();
+        IWshShortcut link = (IWshShortcut)shell.CreateShortcut(shortcutPath);
+
+        // Return the full path of the target file or application
+        return link.TargetPath;
     }
 
     protected override void OnLoad(EventArgs e)
