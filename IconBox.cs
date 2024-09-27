@@ -1,9 +1,21 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace iFence;
 
+
 public class IconBox : Form
 {
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ICONMETRICS
+    {
+        public int cbSize;
+        public int iHorzSpacing;
+        public int iVertSpacing;
+        public int iTitleWrap;
+        public int lfFont;
+    }
+
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
@@ -12,6 +24,15 @@ public class IconBox : Form
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, ref ICONMETRICS pvParam, uint fWinIni);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    public static extern bool SystemParametersInfo(uint uiAction, uint uiParam, out int pvParam, uint fWinIni);
+
+    const uint SPI_GETICONMETRICS = 0x002D;
+    const uint SPI_GETICONSPACING = 0x002F;
 
     private static readonly IntPtr HWND_BOTTOM = new IntPtr(1);
     private const uint SWP_NOSIZE = 0x0001;
@@ -24,6 +45,7 @@ public class IconBox : Form
     private Point dragStartPoint;
     private readonly Label titleLabel;
     private readonly Panel headerPanel;
+    private const int HEADER_HEIGHT = 30;
 
     public IconBox()
     {
@@ -58,7 +80,7 @@ public class IconBox : Form
         SetParent(this.Handle, desktopHandle);
 
         // Set window position to the bottom of the Z-order (below all other windows)
-        SetWindowPos(this.Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE);
+        SetWindowPos(this.Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
 
@@ -143,9 +165,17 @@ public class IconBox : Form
 
     private Rectangle GetWindowBounds()
     {
+        // Calculate and set window size based on icon size and spacing
+        int iconWidth, iconHeight, iconSpacingHorizontal, iconSpacingVertical;
+        GetDesktopIconMetrics(out iconWidth, out iconHeight, out iconSpacingHorizontal, out iconSpacingVertical);
+
+        // Calculate window size for 3 rows and 5 columns of icons
+        int windowWidth = 5 * iconSpacingHorizontal;
+        int windowHeight = 3 * iconSpacingVertical + HEADER_HEIGHT; // Add height for title bar
+
         // Set the initial size and position of the window
-        Width = 300;
-        Height = 300;
+        Width = windowWidth;
+        Height = windowHeight;
 
         // Get screen dimensions
         var screenWidth = Screen.PrimaryScreen!.Bounds.Width;
@@ -158,6 +188,27 @@ public class IconBox : Form
         return new Rectangle(x, y, Width, Height);
     }
 
+    // Method to get desktop icon metrics (size and spacing)
+    private void GetDesktopIconMetrics(out int iconWidth, out int iconHeight, out int spacingHorizontal,
+        out int spacingVertical)
+    {
+        Type t = typeof(SystemInformation);
+        PropertyInfo[] pi = t.GetProperties();
+
+        object? iconSizeObject = pi.FirstOrDefault(p => p.Name == "IconSize")?.GetValue(null);
+        object? iconSpacingVObject = pi.FirstOrDefault(p => p.Name == "IconVerticalSpacing")?.GetValue(null);
+        object? iconSpacingHObject = pi.FirstOrDefault(p => p.Name == "IconHorizontalSpacing")?.GetValue(null);
+
+        var iconSize = (iconSizeObject != null) ? (Size)iconSizeObject : new Size(48, 48);
+        var iconSpacingV = (iconSpacingVObject != null) ? (int)iconSpacingVObject : 75;
+        var iconSpacingH = (iconSpacingHObject != null) ? (int)iconSpacingHObject : 75;
+
+        iconWidth = iconSize.Width;
+        iconHeight = iconSize.Height;
+        spacingHorizontal = iconSpacingH;   // Size Of The Grid Holding Icon
+        spacingVertical = iconSpacingV;     // Size Of The Grid Holding Icon
+    }
+
     private Panel CreateHeaderPanel()
     {
         return new Panel
@@ -165,7 +216,7 @@ public class IconBox : Form
             Text = title,
             AutoSize = false,
             Dock = DockStyle.Top,
-            Height = 30,
+            Height = HEADER_HEIGHT,
             Cursor = Cursors.SizeAll // Change cursor to hand over title bar
         };
     }
@@ -176,7 +227,7 @@ public class IconBox : Form
         {
             Text = title,
             AutoSize = true,
-            Height = 30,
+            Height = HEADER_HEIGHT,
             ForeColor = Color.Black,
             Cursor = Cursors.Default,
             TextAlign = ContentAlignment.MiddleLeft,
