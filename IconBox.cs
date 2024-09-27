@@ -108,6 +108,15 @@ public class IconBox : Form
         MouseDown += ShowContextMenu;
         foreach (Control control in this.Controls)
             control.MouseDown += ShowContextMenu;
+
+        // Custom Resize Handler
+        Resize += (s, e) => 
+        { 
+            iconListView.Top = HEADER_HEIGHT;
+
+            int availableHeight = ClientSize.Height - HEADER_HEIGHT;
+            iconListView.Height = availableHeight;
+        };
     }
 
     private void ShowContextMenu(object? sender, MouseEventArgs e)
