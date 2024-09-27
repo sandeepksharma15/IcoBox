@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 
 namespace iFence;
 
@@ -19,55 +14,31 @@ public class IconBox : Form
     [DllImport("user32.dll", SetLastError = true)]
     private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
 
-    private bool isDragging = false;
-    private string title = "Icon Box Demo";
+    private bool isDragging;
+    private readonly string title = "Icon Box";
     private Point dragStartPoint;
-    private Label titleLabel;
-    private Panel headerPanel;
+    private readonly Label titleLabel;
+    private readonly Panel headerPanel;
 
     public IconBox()
     {
-        var bounds = GetWindowBounds(); // Get bounds for the window
-
-        // Set window properties
-        this.FormBorderStyle = FormBorderStyle.Sizable;
-        this.ControlBox = false; // No control box
-        this.StartPosition = FormStartPosition.Manual;
-        this.Bounds = bounds;
-        this.ShowInTaskbar = false; // Don't show in taskbar
-        this.Opacity = 0.5;
+        SetWindowAppearance();
 
         // Create The Title Label
-        titleLabel = new Label
-        {
-            Text = title,
-            AutoSize = true,
-            Height = 30,
-            ForeColor = Color.Black,
-            Cursor = Cursors.Default,
-            TextAlign = ContentAlignment.MiddleLeft,
-            Font = new Font("Tahoma", 16)
-        };
+        titleLabel = CreateTitleLabel();
 
         // Create Title Bar
-        headerPanel = new Panel
-        {
-            Text = title,
-            AutoSize = false,
-            Dock = DockStyle.Top,
-            Height = 30,
-            Cursor = Cursors.SizeAll // Change cursor to hand over title bar
-        };
+        headerPanel = CreateHeaderPanel();
 
-        titleLabel.DoubleClick += TitleLabel_DoubleClick!; // Double click to edit title
+        titleLabel.DoubleClick += TitleLabel_DoubleClick; // Double click to edit title
 
         headerPanel.Controls.Add(titleLabel);
 
-        headerPanel.MouseMove += HeadePanel_MouseMove!; // Mouse move to enable dragging
-        headerPanel.MouseDown += HeadePanel_MouseDown!; // Mouse down to start dragging
-        headerPanel.MouseUp += HeadePanel_MouseUp!; // Mouse up to stop dragging
+        headerPanel.MouseMove += HeaderPanel_MouseMove; // Mouse move to enable dragging
+        headerPanel.MouseDown += HeaderPanel_MouseDown; // Mouse down to start dragging
+        headerPanel.MouseUp += HeaderPanel_MouseUp; // Mouse up to stop dragging
 
-        this.Controls.Add(headerPanel);
+        Controls.Add(headerPanel);
     }
 
     protected override void OnPaint(PaintEventArgs e)
@@ -77,17 +48,17 @@ public class IconBox : Form
         // Create semi-transparent background for the form body
         using (Brush bodyBrush = new SolidBrush(Color.FromArgb(192, 0, 0, 0)))
         {
-            e.Graphics.FillRectangle(bodyBrush, new Rectangle(0, 31, this.Width, this.Height));
+            e.Graphics.FillRectangle(bodyBrush, new Rectangle(0, 31, Width, Height));
         }
 
         // Create semi-transparent background for the title bar
         using (Brush titleBrush = new SolidBrush(Color.DarkBlue))
         {
-            e.Graphics.FillRectangle(titleBrush, new Rectangle(0, 0, this.Width, 30)); // Adjust height as needed
+            e.Graphics.FillRectangle(titleBrush, new Rectangle(0, 0, Width, 30)); // Adjust height as needed
         }
     }
 
-    private void TitleLabel_DoubleClick(object sender, EventArgs e)
+    private void TitleLabel_DoubleClick(object? sender, EventArgs e)
     {
         // Allow editing of the title label on double click
         TextBox textBox = new TextBox
@@ -105,10 +76,7 @@ public class IconBox : Form
         textBox.SelectAll(); // Select all text
 
         // Update title when text changes
-        textBox.Leave += (s, args) =>
-        {
-            ConfirmTitleChange(textBox);
-        };
+        textBox.Leave += (s, args) => ConfirmTitleChange(textBox);
 
         // Handle pressing Enter or Tab
         textBox.KeyDown += (s, keyArgs) =>
@@ -128,17 +96,17 @@ public class IconBox : Form
         Controls.Remove(textBox); // Remove the textbox after editing is complete
     }
 
-    private void HeadePanel_MouseMove(object sender, MouseEventArgs e)
+    private void HeaderPanel_MouseMove(object? sender, MouseEventArgs e)
     {
         if (isDragging)
         {
             // Move the window by adjusting its location
-            this.Left += e.X - dragStartPoint.X;
-            this.Top += e.Y - dragStartPoint.Y;
+            Left += e.X - dragStartPoint.X;
+            Top += e.Y - dragStartPoint.Y;
         }
     }
 
-    private void HeadePanel_MouseDown(object sender, MouseEventArgs e)
+    private void HeaderPanel_MouseDown(object? sender, MouseEventArgs e)
     {
         if (e.Button == MouseButtons.Left)
         {
@@ -147,7 +115,7 @@ public class IconBox : Form
         }
     }
 
-    private void HeadePanel_MouseUp(object sender, MouseEventArgs e)
+    private void HeaderPanel_MouseUp(object? sender, MouseEventArgs e)
     {
         isDragging = false;
     }
@@ -155,23 +123,63 @@ public class IconBox : Form
     protected override void OnLoad(EventArgs e)
     {
         base.OnLoad(e);
-        this.ShowInTaskbar = false; // Don't show in taskbar
+        ShowInTaskbar = false; // Don't show in taskbar
     }
 
     private Rectangle GetWindowBounds()
     {
         // Set the initial size and position of the window
-        this.Width = 300;
-        this.Height = 300;
+        Width = 300;
+        Height = 300;
 
         // Get screen dimensions
         var screenWidth = Screen.PrimaryScreen!.Bounds.Width;
         var screenHeight = Screen.PrimaryScreen!.Bounds.Height;
 
         // Calculate position (right side aligned, bottom 100px above the screen)
-        int x = screenWidth - this.Width - 10;  // Position x such that right side touches viewport (with 10px padding)
-        int y = screenHeight - this.Height - 100;  // Position y 100px above bottom of screen
+        int x = screenWidth - Width - 10;  // Position x such that right side touches viewport (with 10px padding)
+        int y = screenHeight - Height - 100;  // Position y 100px above bottom of screen
 
-        return new Rectangle(x, y, this.Width, this.Height);
+        return new Rectangle(x, y, Width, Height);
     }
+
+    private Panel CreateHeaderPanel()
+    {
+        return new Panel
+        {
+            Text = title,
+            AutoSize = false,
+            Dock = DockStyle.Top,
+            Height = 30,
+            Cursor = Cursors.SizeAll // Change cursor to hand over title bar
+        };
+    }
+
+    private Label CreateTitleLabel()
+    {
+        return new Label
+        {
+            Text = title,
+            AutoSize = true,
+            Height = 30,
+            ForeColor = Color.Black,
+            Cursor = Cursors.Default,
+            TextAlign = ContentAlignment.MiddleLeft,
+            Font = new Font("Tahoma", 16)
+        };
+    }
+
+    private void SetWindowAppearance()
+    {
+        var bounds = GetWindowBounds(); // Get bounds for the window
+
+        // Set window properties
+        FormBorderStyle = FormBorderStyle.Sizable;
+        ControlBox = false; // No control box
+        StartPosition = FormStartPosition.Manual;
+        Bounds = bounds;
+        ShowInTaskbar = false; // Don't show in taskbar
+        Opacity = 0.5;
+    }
+
 }
