@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -33,6 +34,7 @@ public class IconBox : Form
     private readonly Label titleLabel;
     private readonly Panel headerPanel;
     private readonly ListView iconListView;
+    private ContextMenuStrip contextMenuStrip;
 
     private readonly List<(string FilePath, string FileName)> movedFiles = []; // To store the file paths and names of moved files
 
@@ -94,6 +96,57 @@ public class IconBox : Form
 
         Controls.Add(headerPanel);
         Controls.Add(iconListView);
+
+        // Setup Context Menu
+        contextMenuStrip = GetContextMenu();
+        MouseDown += ShowContextMenu;
+        foreach (Control control in this.Controls)
+            control.MouseDown += ShowContextMenu;
+    }
+
+    private void ShowContextMenu(object? sender, MouseEventArgs e)
+    {
+        if (e.Button == MouseButtons.Right)
+            contextMenuStrip.Show(this, e.Location);
+    }
+
+    private ContextMenuStrip GetContextMenu()
+    {
+        contextMenuStrip = new ContextMenuStrip();
+        contextMenuStrip.Items.Add("Auto Arrange Items", null, AutoArrangeItems);
+        contextMenuStrip.Items.Add("Arrange Items By Name", null, ArrangeItemsByName);
+        contextMenuStrip.Items.Add("Arrange Items By Type", null, ArrangeItemsByType);
+        contextMenuStrip.Items.Add("-");
+        contextMenuStrip.Items.Add("Remove This Icon Box", null, RemoveThisIconBox);
+
+        return contextMenuStrip;
+    }
+
+    private void AutoArrangeItems(object? sender, EventArgs e)
+    {
+        // Toggle the AutoArrange property of the ListView
+        iconListView.AutoArrange = !iconListView.AutoArrange;
+    }
+
+    private void RemoveThisIconBox(object? sender, EventArgs e)
+    {
+        if (iconListView.Items.Count > 0)
+            MessageBox.Show("Please remove all icons before remnoving the Icon Box.", "Error", 
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+        else
+            Close();
+    }
+
+    private void ArrangeItemsByType(object? sender, EventArgs e)
+    {
+        iconListView.ListViewItemSorter = new ListViewItemComparer(ArrangeType.ByType, true);
+        iconListView.Sort();
+    }
+
+    private void ArrangeItemsByName(object? sender, EventArgs e)
+    {
+        iconListView.ListViewItemSorter = new ListViewItemComparer(ArrangeType.ByName, true);
+        iconListView.Sort();
     }
 
     // Item drag event handler
