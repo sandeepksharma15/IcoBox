@@ -119,6 +119,10 @@ public class IconBox : Form
         contextMenuStrip.Items.Add("-");
         contextMenuStrip.Items.Add("Remove This Icon Box", null, RemoveThisIconBox);
 
+        // Set the AutoArrange menu item checked state
+        var autoArrangeMenuItem = (ToolStripMenuItem)contextMenuStrip.Items[0];
+        autoArrangeMenuItem.Checked = iconListView.AutoArrange;
+
         return contextMenuStrip;
     }
 
@@ -126,12 +130,16 @@ public class IconBox : Form
     {
         // Toggle the AutoArrange property of the ListView
         iconListView.AutoArrange = !iconListView.AutoArrange;
+
+        // Set the AutoArrange menu item checked state
+        var autoArrangeMenuItem = (ToolStripMenuItem)contextMenuStrip.Items[0];
+        autoArrangeMenuItem.Checked = iconListView.AutoArrange;
     }
 
     private void RemoveThisIconBox(object? sender, EventArgs e)
     {
         if (iconListView.Items.Count > 0)
-            MessageBox.Show("Please remove all icons before remnoving the Icon Box.", "Error", 
+            MessageBox.Show("Please remove all icons before remnoving the Icon Box...", "Remove Error",
                 MessageBoxButtons.OK, MessageBoxIcon.Error);
         else
             Close();
@@ -139,14 +147,50 @@ public class IconBox : Form
 
     private void ArrangeItemsByType(object? sender, EventArgs e)
     {
-        iconListView.ListViewItemSorter = new ListViewItemComparer(ArrangeType.ByType, true);
-        iconListView.Sort();
+        // Get The Menu Item
+        var menuItem = (ToolStripMenuItem)contextMenuStrip.Items[2];
+
+        if (menuItem.Checked is false)
+        {
+            iconListView.ListViewItemSorter = new ListViewItemComparer(ArrangeType.ByType, true);
+            iconListView.Sort();
+
+            // Update Menu Item Checked State
+            menuItem.Checked = true;
+
+            // Uncheck the other menu item
+            var otherMenuItem = (ToolStripMenuItem)contextMenuStrip.Items[1];
+            otherMenuItem.Checked = false;
+        }
+        else
+        {
+            menuItem.Checked = false;
+            iconListView.Sorting = SortOrder.None;
+        }
     }
 
     private void ArrangeItemsByName(object? sender, EventArgs e)
     {
-        iconListView.ListViewItemSorter = new ListViewItemComparer(ArrangeType.ByName, true);
-        iconListView.Sort();
+        // Get The Menu Item
+        var menuItem = (ToolStripMenuItem)contextMenuStrip.Items[1];
+
+        if (menuItem.Checked is false)
+        {
+            iconListView.ListViewItemSorter = new ListViewItemComparer(ArrangeType.ByName, true);
+            iconListView.Sort();
+
+            // Update Menu Item Checked State
+            menuItem.Checked = true;
+
+            // Uncheck the other menu item
+            var otherMenuItem = (ToolStripMenuItem)contextMenuStrip.Items[2];
+            otherMenuItem.Checked = false;
+        }
+        else
+        {
+            menuItem.Checked = false;
+            iconListView.Sorting = SortOrder.None;
+        }
     }
 
     // Item drag event handler
@@ -214,9 +258,9 @@ public class IconBox : Form
 
                     // Extract and set the icon for the item
                     Icon fileIcon = Icon.ExtractAssociatedIcon(destinationPath)
-                        ?? new Icon(SystemIcons.Application, 48, 48); 
+                        ?? new Icon(SystemIcons.Application, 48, 48);
 
-                    iconListView.LargeImageList!.Images.Add(fileName, fileIcon); 
+                    iconListView.LargeImageList!.Images.Add(fileName, fileIcon);
                     iconListView.Items.Add(item);
                 }
                 catch (Exception ex)
