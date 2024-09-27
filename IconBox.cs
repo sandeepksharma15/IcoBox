@@ -69,7 +69,6 @@ public class IconBox : Form
         // Subscribe To Drag Events
         iconListView.DragEnter += new DragEventHandler(OnDragEnter);
         iconListView.DragDrop += new DragEventHandler(OnDragDrop);
-        //Paint += new PaintEventHandler(DrawIcons); // Redraw icons when window repaints
 
         titleLabel.DoubleClick += TitleLabel_DoubleClick; // Double click to edit title
 
@@ -115,7 +114,7 @@ public class IconBox : Form
                     File.Move(filePath, destinationPath);
 
                     // Create a ListViewItem for the moved file
-                    ListViewItem item = new ListViewItem(fileName);
+                    ListViewItem item = new(fileName);
                     item.ImageKey = fileName; // Use the filename as the key
 
                     // Extract and set the icon for the item
@@ -123,56 +122,14 @@ public class IconBox : Form
                         ?? new Icon(SystemIcons.Application, 48, 48); 
 
                     iconListView.LargeImageList!.Images.Add(fileName, fileIcon); 
-                    iconListView.Items.Add(item); // Add the item to the ListView
-
-                    //// Add the moved file to the list for rendering
-                    //movedFiles.Add((destinationPath, fileName));
+                    iconListView.Items.Add(item);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error moving file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-            //// Redraw the window to display the moved icons
-            //Invalidate();
         }
     }
-
-    //private void DrawIcons(object? sender, PaintEventArgs e)
-    //{
-    //    Graphics g = e.Graphics;
-    //    int x = 0;
-    //    int y = HEADER_HEIGHT;
-
-    //    // Draw the opaque background first
-    //    g.Clear(this.BackColor); // This ensures the background is fully opaque
-
-    //    foreach (var (filePath, fileName) in movedFiles)
-    //        try
-    //        {
-    //            // Get the icon associated with the file
-    //            Icon fileIcon = Icon.ExtractAssociatedIcon(filePath)
-    //                ?? new Icon(SystemIcons.Application, 48, 48);
-
-    //            // Draw the icon at the specified location
-    //            g.DrawIcon(fileIcon, new Rectangle(x, y, IconWidth, IconHeight));
-
-    //            // Draw the file name below the icon
-    //            g.DrawString(fileName, this.Font, Brushes.Black, new PointF(x, y + IconHeight));
-
-    //            // Move to the next position for the next icon
-    //            x += IconSpacingH;
-    //            if (x + IconSpacingH > Width)
-    //            {
-    //                x = 0;
-    //                y += IconSpacingV;
-    //            }
-    //        }
-    //        catch (Exception ex)
-    //        {
-    //            MessageBox.Show($"Error displaying icon: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-    //        }
-    //}
 
     protected override void OnLoad(EventArgs e)
     {
@@ -189,19 +146,18 @@ public class IconBox : Form
         SetWindowPos(Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
+    //protected override void OnPaint(PaintEventArgs e)
+    //{
+    //    base.OnPaint(e);
 
-    protected override void OnPaint(PaintEventArgs e)
-    {
-        base.OnPaint(e);
+    //    // Create semi-transparent background for the form body
+    //    using (Brush bodyBrush = new SolidBrush(Color.FromArgb(192, 0, 0, 0)))
+    //        e.Graphics.FillRectangle(bodyBrush, new Rectangle(0, 31, Width, Height));
 
-        // Create semi-transparent background for the form body
-        using (Brush bodyBrush = new SolidBrush(Color.FromArgb(192, 0, 0, 0)))
-            e.Graphics.FillRectangle(bodyBrush, new Rectangle(0, 31, Width, Height));
-
-        // Create semi-transparent background for the title bar
-        using (Brush titleBrush = new SolidBrush(Color.DarkBlue))
-            e.Graphics.FillRectangle(titleBrush, new Rectangle(0, 0, Width, 30)); // Adjust height as needed
-    }
+    //    // Create semi-transparent background for the title bar
+    //    using (Brush titleBrush = new SolidBrush(Color.DarkBlue))
+    //        e.Graphics.FillRectangle(titleBrush, new Rectangle(0, 0, Width, 30)); // Adjust height as needed
+    //}
 
     private void TitleLabel_DoubleClick(object? sender, EventArgs e)
     {
@@ -339,7 +295,7 @@ public class IconBox : Form
     private static ListView CreateIconListView(int height, int width)
     {
         ImageList imageList = new();
-        imageList.ImageSize = new Size(64, 64); // Size of icons
+        imageList.ImageSize = new Size(40, 40); // Size of icons
 
         return new ListView
         {
