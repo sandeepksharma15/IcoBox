@@ -9,6 +9,9 @@ public class MainApp : Form
 {
     private NotifyIcon? trayIcon;
     private ContextMenuStrip? trayMenu;
+    private readonly string? iconsFolder;
+
+    public string? IconsFolder => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources");
 
     [STAThread]
     public static void Main()
@@ -37,7 +40,7 @@ public class MainApp : Form
         // Create a tray icon
         trayIcon = new NotifyIcon();
         trayIcon.Text = "Icon Box";
-        trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
+        trayIcon.Icon = new Icon(Path.Combine(IconsFolder!, "IcoBox.ico"), 40, 40);
 
         // Add menu to tray icon
         trayIcon.ContextMenuStrip = trayMenu;
