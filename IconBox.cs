@@ -275,8 +275,11 @@ public class IconBox : Form
                     // Move the file to the destination folder
                     System.IO.File.Move(filePath, destinationPath);
 
+                    // Get the file name without the .lnk extension
+                    string displayName = Path.GetFileNameWithoutExtension(fileName);
+
                     // Create a ListViewItem for the moved file and store the file path in the Tag
-                    ListViewItem item = new(fileName)
+                    ListViewItem item = new(displayName)
                     {
                         ImageKey = fileName, // Use the filename as the key
                         Tag = destinationPath // Store the file path in the Tag property
@@ -510,8 +513,11 @@ public class IconBox : Form
             string fileName = Path.GetFileName(filePath);
             string destinationPath = Path.Combine(AppFolder!, fileName);
 
+            // Get the file name without the .lnk extension
+            string displayName = Path.GetFileNameWithoutExtension(fileName);
+
             // Create a ListViewItem for the moved file and store the file path in the Tag
-            ListViewItem item = new(fileName)
+            ListViewItem item = new(displayName)
             {
                 ImageKey = fileName, // Use the filename as the key
                 Tag = destinationPath // Store the file path in the Tag property
