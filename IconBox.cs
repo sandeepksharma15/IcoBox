@@ -40,10 +40,7 @@ public class IconBox : Form
 
     private readonly List<(string FilePath, string FileName)> movedFiles = []; // To store the file paths and names of moved files
 
-    private static int IconWidth;
-    private static int IconHeight;
-    private static int IconSpacingH;
-    private static int IconSpacingV;
+    private static Helpers.IconMetrics IconMetrics = new();
 
     public static string? AppFolder
     {
@@ -103,6 +100,9 @@ public class IconBox : Form
         Controls.Add(headerPanel);
         Controls.Add(iconListView);
 
+        // Apply Theme Colors
+        ApplyThemeColors();
+
         // Setup Context Menu
         contextMenuStrip = GetContextMenu();
         MouseDown += ShowContextMenu;
@@ -117,6 +117,17 @@ public class IconBox : Form
             int availableHeight = ClientSize.Height - HEADER_HEIGHT;
             iconListView.Height = availableHeight;
         };
+    }
+
+    private void ApplyThemeColors()
+    {
+        BackColor = SystemColors.ActiveCaption;
+
+        headerPanel.BackColor = SystemColors.ActiveCaption;
+        titleLabel.ForeColor = SystemColors.ActiveCaptionText;
+
+        iconListView.BackColor = SystemColors.Window;
+        iconListView.ForeColor = SystemColors.WindowText;
     }
 
     private void ShowContextMenu(object? sender, MouseEventArgs e)
@@ -353,19 +364,6 @@ public class IconBox : Form
         SetWindowPos(Handle, HWND_BOTTOM, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
     }
 
-    //protected override void OnPaint(PaintEventArgs e)
-    //{
-    //    base.OnPaint(e);
-
-    //    // Create semi-transparent background for the form body
-    //    using (Brush bodyBrush = new SolidBrush(Color.FromArgb(192, 0, 0, 0)))
-    //        e.Graphics.FillRectangle(bodyBrush, new Rectangle(0, 31, Width, Height));
-
-    //    // Create semi-transparent background for the title bar
-    //    using (Brush titleBrush = new SolidBrush(Color.DarkBlue))
-    //        e.Graphics.FillRectangle(titleBrush, new Rectangle(0, 0, Width, 30)); // Adjust height as needed
-    //}
-
     private void TitleLabel_DoubleClick(object? sender, EventArgs e)
     {
         // Allow editing of the title label on double click
@@ -431,16 +429,11 @@ public class IconBox : Form
     private static Rectangle GetWindowBounds()
     {
         // Calculate and set window size based on icon size and spacing
-        GetDesktopIconMetrics(out IconWidth, out IconHeight, out IconSpacingH,
-            out IconSpacingV);
+        IconMetrics = Helpers.GetDesktopIconMetrics();
 
         // Calculate window size for 3 rows and 5 columns of icons
-        int windowWidth = 5 * IconSpacingH;
-        int windowHeight = 3 * IconSpacingV + HEADER_HEIGHT; // Add height for title bar
-
-        // Set the initial size and position of the window
-        //Width = windowWidth;
-        //Height = windowHeight;
+        int windowWidth = 5 * IconMetrics.SpacingHorizontal;
+        int windowHeight = 3 * IconMetrics.SpacingVertical + HEADER_HEIGHT; // Add height for title bar
 
         // Get screen dimensions
         var screenWidth = Screen.PrimaryScreen!.Bounds.Width;
@@ -451,27 +444,6 @@ public class IconBox : Form
         int y = screenHeight - windowHeight - 100;  // Position y 100px above bottom of screen
 
         return new Rectangle(x, y, windowWidth, windowHeight);
-    }
-
-    // Method to get desktop icon metrics (size and spacing)
-    private static void GetDesktopIconMetrics(out int iconWidth, out int iconHeight, out int spacingHorizontal,
-        out int spacingVertical)
-    {
-        Type t = typeof(SystemInformation);
-        PropertyInfo[] pi = t.GetProperties();
-
-        object? iconSizeObject = pi.FirstOrDefault(p => p.Name == "IconSize")?.GetValue(null);
-        object? iconSpacingVObject = pi.FirstOrDefault(p => p.Name == "IconVerticalSpacing")?.GetValue(null);
-        object? iconSpacingHObject = pi.FirstOrDefault(p => p.Name == "IconHorizontalSpacing")?.GetValue(null);
-
-        var iconSize = iconSizeObject != null ? (Size)iconSizeObject : new Size(48, 48);
-        var iconSpacingV = iconSpacingVObject != null ? (int)iconSpacingVObject : 75;
-        var iconSpacingH = iconSpacingHObject != null ? (int)iconSpacingHObject : 75;
-
-        iconWidth = iconSize.Width;
-        iconHeight = iconSize.Height;
-        spacingHorizontal = iconSpacingH;   // Size Of The Grid Holding Icon
-        spacingVertical = iconSpacingV;     // Size Of The Grid Holding Icon
     }
 
     private static Panel CreateHeaderPanel()
@@ -515,7 +487,6 @@ public class IconBox : Form
 
         return iconPictureBox;
     }
-
 
     private static ListView CreateIconListView(int height, int width, List<string>? iconPaths)
     {
@@ -568,5 +539,7 @@ public class IconBox : Form
         Bounds = bounds.Value;
         ShowInTaskbar = false; // Don't show in taskbar
         Opacity = 1.0;
+
+        Padding = new Padding(0);
     }
 }
