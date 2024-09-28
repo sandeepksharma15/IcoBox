@@ -121,12 +121,12 @@ public class IconBox : Form
 
     private void ApplyThemeColors()
     {
-        BackColor = SystemColors.ActiveCaption;
+        // BackColor = SystemColors.ActiveCaption;
 
-        headerPanel.BackColor = SystemColors.ActiveCaption;
+        //headerPanel.BackColor = SystemColors.ActiveCaption;
         titleLabel.ForeColor = SystemColors.ActiveCaptionText;
 
-        iconListView.BackColor = SystemColors.Window;
+        iconListView.BackColor = Color.LightGray;
         iconListView.ForeColor = SystemColors.WindowText;
     }
 
