@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
+using System.Windows.Forms;
 
 using static IcoBox.MainApp;
 
@@ -31,10 +32,14 @@ public class MainApp : Form
     private void DisplayTrayMenu()
     {
         trayMenu = new ContextMenuStrip();
-        trayMenu.Items.Add("About", null, AboutIcoBox!);
-        trayMenu.Items.Add("New Icon Box", null, CreateIconGrpup!);
+        trayMenu.Items.Add("About", null, AboutIcoBox);
+        trayMenu.Items.Add("New Icon Box", null, CreateIconGrpup);
+        trayMenu.Items.Add("Start with Windows", null, LoadAtStartup);
         trayMenu.Items.Add("-");
         trayMenu.Items.Add("Exit", null, OnExit!);
+
+        // Set the checked state
+        UpdateStartupMenuCheckState();
 
         // Create a tray icon
         trayIcon = new NotifyIcon();
@@ -48,12 +53,29 @@ public class MainApp : Form
         trayIcon.Visible = true;
     }
 
-    private void CreateIconGrpup(object sender, EventArgs e)
+    private void UpdateStartupMenuCheckState()
+    {
+        var loadAtStartupMenuItem = (ToolStripMenuItem)trayMenu!.Items[2];
+        loadAtStartupMenuItem.Checked = Helpers.IsInStartup(AppInfo.AppName);
+    }
+
+    private void LoadAtStartup(object? sender, EventArgs e)
+    {
+        if (Helpers.IsInStartup(AppInfo.AppName))
+            Helpers.RemoveFromStartup(AppInfo.AppName);
+        else
+            Helpers.AddToStartup(AppInfo.AppName, Application.ExecutablePath);
+
+        // Set the checked state
+        UpdateStartupMenuCheckState();
+    }
+
+    private void CreateIconGrpup(object? sender, EventArgs e)
     {
         new IconBox().Show();
     }
 
-    private void AboutIcoBox(object sender, EventArgs e)
+    private void AboutIcoBox(object? sender, EventArgs e)
     {
         MessageBox.Show("Show About Box");
     }

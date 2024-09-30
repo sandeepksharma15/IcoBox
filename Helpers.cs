@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 
+using Microsoft.Win32;
+
 namespace IcoBox;
 
 public static class Helpers
@@ -38,4 +40,23 @@ public static class Helpers
         };
     }
 
+    private const string RegistryPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Run";
+
+    public static bool IsInStartup(string appName)
+    {
+        RegistryKey? key = Registry.CurrentUser.OpenSubKey(RegistryPath, true);
+        return key?.GetValue(appName) != null;
+    }
+
+    public static void AddToStartup(string appName, string appPath)
+    {
+        RegistryKey? key = Registry.CurrentUser.OpenSubKey(RegistryPath, true);
+        key?.SetValue(appName, appPath);
+    }
+
+    public static void RemoveFromStartup(string appName)
+    {
+        RegistryKey? key = Registry.CurrentUser.OpenSubKey(RegistryPath, true);
+        key?.DeleteValue(appName, false); // 'false' prevents an exception if the value does not exist
+    }
 }
