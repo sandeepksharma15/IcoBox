@@ -1,8 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Text.Json;
-using System.Windows.Forms;
-
-using static IcoBox.MainApp;
 
 namespace IcoBox;
 
@@ -18,6 +15,9 @@ public class MainApp : Form
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
+        Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+        Application.SetHighDpiMode(HighDpiMode.SystemAware);
+
         Application.Run(new MainApp());
     }
 
