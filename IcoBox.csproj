@@ -2,10 +2,24 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net9.0-windows</TargetFramework>
+		<TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<UseWindowsForms>true</UseWindowsForms>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<ApplicationIcon>Resources\IcoBox II (256x256).ico</ApplicationIcon>
+		<SignAssembly>False</SignAssembly>
+		<Title>IcoBox</Title>
+		<Description>Setup for IcoBox, Desktop Icon Manager</Description>
+		<Copyright>GNU GENERAL PUBLIC LICENSE</Copyright>
+		<PackageProjectUrl>https://github.com/sandeepksharma15/IcoBox/releases/new</PackageProjectUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>fence,icons,icon,organizaer,desktop,box</PackageTags>
+		<NeutralLanguage>en</NeutralLanguage>
+		<Authors>Sandeep</Authors>
+		<RepositoryUrl>https://github.com/sandeepksharma15/IcoBox</RepositoryUrl>
+		<PlatformTarget>x64</PlatformTarget>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -40,6 +54,21 @@
 		<Content Include="Resources\IcoBox.ico">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Properties\Settings.Designer.cs">
+	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Settings.settings</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Properties\Settings.settings">
+	    <Generator>SettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 
 </Project>
