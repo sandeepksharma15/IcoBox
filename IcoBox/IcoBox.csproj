@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <OutputType>WinExe</OutputType>
+	  <TargetFramework>net8.0-windows10.0.22000.0</TargetFramework>
+	  <Nullable>enable</Nullable>
+	  <UseWindowsForms>true</UseWindowsForms>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <ApplicationIcon>Resources\IcoBox II (256x256).ico</ApplicationIcon>
+	  <SignAssembly>False</SignAssembly>
+	  <Title>IcoBox</Title>
+	  <Description>Setup for IcoBox, Desktop Icon Manager</Description>
+	  <Copyright>GNU GENERAL PUBLIC LICENSE</Copyright>
+	  <PackageProjectUrl>https://github.com/sandeepksharma15/IcoBox/releases/new</PackageProjectUrl>
+	  <RepositoryType>git</RepositoryType>
+	  <PackageTags>fence,icons,icon,organizaer,desktop,box</PackageTags>
+	  <NeutralLanguage>en</NeutralLanguage>
+	  <Authors>Sandeep</Authors>
+	  <RepositoryUrl>https://github.com/sandeepksharma15/IcoBox</RepositoryUrl>
+	  <PlatformTarget>x64</PlatformTarget>
+	  <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+	  <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Resources\IcoBox II %28256x256%29.ico" />
+		<None Remove="Resources\IcoBox II %2840x40%29.ico" />
+		<None Remove="Resources\IcoBox III %2816x16%29.ico" />
+		<None Remove="Resources\IcoBox.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<COMReference Include="IWshRuntimeLibrary">
+			<WrapperTool>tlbimp</WrapperTool>
+			<VersionMinor>0</VersionMinor>
+			<VersionMajor>1</VersionMajor>
+			<Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+			<EmbedInteropTypes>true</EmbedInteropTypes>
+		</COMReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Resources\IcoBox II (256x256).ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\IcoBox II (40x40).ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\IcoBox III (16x16).ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="Resources\IcoBox.ico">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+</Project>

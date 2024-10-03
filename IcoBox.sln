@@ -1,61 +1,33 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35309.182
+VisualStudioVersion = 17.12.35323.107
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IcoBox", "IcoBox.csproj", "{5647CD57-3E02-419A-A6DD-7AE51259346A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IcoBox", "IcoBox\IcoBox.csproj", "{BC6DAFD7-6394-4210-9A29-4D89B9EF5548}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "IcoBoxSetup", "IcoBoxSetup\IcoBoxSetup.vdproj", "{9A5644D4-8688-4657-81F9-D19001CD10D5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E4EBB208-4C44-4000-A828-F8AC8EC3ADB6}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE.txt = LICENSE.txt
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug|ARM = Debug|ARM
-		Debug|ARM64 = Debug|ARM64
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
-		Release|ARM = Release|ARM
-		Release|ARM64 = Release|ARM64
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|ARM.Build.0 = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|ARM64.ActiveCfg = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|ARM64.Build.0 = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|x64.Build.0 = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Debug|x86.Build.0 = Debug|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|ARM.ActiveCfg = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|ARM.Build.0 = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|ARM64.ActiveCfg = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|ARM64.Build.0 = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|x64.ActiveCfg = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|x64.Build.0 = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|x86.ActiveCfg = Release|Any CPU
-		{5647CD57-3E02-419A-A6DD-7AE51259346A}.Release|x86.Build.0 = Release|Any CPU
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Debug|Any CPU.ActiveCfg = Debug
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Debug|ARM.ActiveCfg = Debug
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Debug|ARM64.ActiveCfg = Debug
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Debug|x64.ActiveCfg = Debug
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Debug|x86.ActiveCfg = Debug
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Release|Any CPU.ActiveCfg = Release
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Release|ARM.ActiveCfg = Release
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Release|ARM64.ActiveCfg = Release
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Release|x64.ActiveCfg = Release
-		{9A5644D4-8688-4657-81F9-D19001CD10D5}.Release|x86.ActiveCfg = Release
+		{BC6DAFD7-6394-4210-9A29-4D89B9EF5548}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC6DAFD7-6394-4210-9A29-4D89B9EF5548}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC6DAFD7-6394-4210-9A29-4D89B9EF5548}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC6DAFD7-6394-4210-9A29-4D89B9EF5548}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {FFA1137B-33A5-44F4-8B3D-BC5238478B25}
+		SolutionGuid = {C8A05CDF-3E11-4C00-B0F3-A6670A433721}
 	EndGlobalSection
 EndGlobal
